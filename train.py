@@ -19,9 +19,9 @@ parser.add_argument('--list_dir', type=str,
 parser.add_argument('--num_classes', type=int,
                     default=9, help='output channel of network')
 parser.add_argument('--max_iterations', type=int,
-                    default=30000, help='maximum epoch number to train')
+                    default=10000, help='maximum epoch number to train')
 parser.add_argument('--max_epochs', type=int,
-                    default=150, help='maximum epoch number to train')
+                    default=20, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int,
                     default=24, help='batch_size per gpu')
 parser.add_argument('--n_gpu', type=int, default=1, help='total gpu')
@@ -62,6 +62,8 @@ if __name__ == "__main__":
             'num_classes': 9,
         },
     }
+    if args.batch_size != 24 and args.batch_size % 6 == 0:
+        args.base_lr *= args.batch_size / 24
     args.num_classes = dataset_config[dataset_name]['num_classes']
     args.root_path = dataset_config[dataset_name]['root_path']
     args.list_dir = dataset_config[dataset_name]['list_dir']

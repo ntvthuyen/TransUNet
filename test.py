@@ -9,6 +9,7 @@ import torch.backends.cudnn as cudnn
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from datasets.dataset_eyetracking import Eyetracking_dataset
 from datasets.dataset_synapse import Synapse_dataset
 from utils import test_single_volume
 from networks.vit_seg_modeling import VisionTransformer as ViT_seg
@@ -43,13 +44,14 @@ args = parser.parse_args()
 
 
 def inference(args, model, test_save_path=None):
-    db_test = args.Dataset(base_dir=args.volume_path, split="test_vol", list_dir=args.list_dir)
+    db_test = args.Dataset(split="test_manual")
     testloader = DataLoader(db_test, batch_size=1, shuffle=False, num_workers=1)
     logging.info("{} test iterations per epoch".format(len(testloader)))
     model.eval()
     metric_list = 0.0
     for i_batch, sampled_batch in tqdm(enumerate(testloader)):
-        h, w = sampled_batch["image"].size()[2:]
+        print(sampled_batch["image"].size())
+        h, w = sampled_batch["image"].size()[1:]
         image, label, case_name = sampled_batch["image"], sampled_batch["label"], sampled_batch['case_name'][0]
         metric_i = test_single_volume(image, label, model, classes=args.num_classes, patch_size=[args.img_size, args.img_size],
                                       test_save_path=test_save_path, case=case_name, z_spacing=args.z_spacing)
@@ -79,7 +81,7 @@ if __name__ == "__main__":
 
     dataset_config = {
         'Synapse': {
-            'Dataset': Synapse_dataset,
+            'Dataset': Eyetracking_dataset,
             'volume_path': '../data/Synapse/test_vol_h5',
             'list_dir': './lists/lists_Synapse',
             'num_classes': 9,
@@ -93,22 +95,14 @@ if __name__ == "__main__":
     args.list_dir = dataset_config[dataset_name]['list_dir']
     args.z_spacing = dataset_config[dataset_name]['z_spacing']
     args.is_pretrain = True
+    
+    # modified
+
 
     # name the same snapshot defined in train script!
-    args.exp = 'TU_' + dataset_name + str(args.img_size)
-    snapshot_path = "../model/{}/{}".format(args.exp, 'TU')
-    snapshot_path = snapshot_path + '_pretrain' if args.is_pretrain else snapshot_path
-    snapshot_path += '_' + args.vit_name
-    snapshot_path = snapshot_path + '_skip' + str(args.n_skip)
-    snapshot_path = snapshot_path + '_vitpatch' + str(args.vit_patches_size) if args.vit_patches_size!=16 else snapshot_path
-    snapshot_path = snapshot_path + '_epo' + str(args.max_epochs) if args.max_epochs != 30 else snapshot_path
-    if dataset_name == 'ACDC':  # using max_epoch instead of iteration to control training duration
-        snapshot_path = snapshot_path + '_' + str(args.max_iterations)[0:2] + 'k' if args.max_iterations != 30000 else snapshot_path
-    snapshot_path = snapshot_path+'_bs'+str(args.batch_size)
-    snapshot_path = snapshot_path + '_lr' + str(args.base_lr) if args.base_lr != 0.01 else snapshot_path
-    snapshot_path = snapshot_path + '_'+str(args.img_size)
-    snapshot_path = snapshot_path + '_s'+str(args.seed) if args.seed!=1234 else snapshot_path
-
+    args.exp = 'TU_pretrain_R50-ViT-B_16_skip3_10k_epo20_bs24_224' #'TU_pretrain_R50-ViT-B_16_skip3_10k_epo15_bs24_224' #'TU_' + dataset_name + str(args.img_size)
+    snapshot_path = "../model/TU_Synapse224/" + args.exp
+    
     config_vit = CONFIGS_ViT_seg[args.vit_name]
     config_vit.n_classes = args.num_classes
     config_vit.n_skip = args.n_skip
@@ -118,7 +112,7 @@ if __name__ == "__main__":
     net = ViT_seg(config_vit, img_size=args.img_size, num_classes=config_vit.n_classes).cuda()
 
     snapshot = os.path.join(snapshot_path, 'best_model.pth')
-    if not os.path.exists(snapshot): snapshot = snapshot.replace('best_model', 'epoch_'+str(args.max_epochs-1))
+    if not os.path.exists(snapshot): snapshot = snapshot.replace('best_model', 'epoch_19')
     net.load_state_dict(torch.load(snapshot))
     snapshot_name = snapshot_path.split('/')[-1]
 
@@ -129,7 +123,7 @@ if __name__ == "__main__":
     logging.info(str(args))
     logging.info(snapshot_name)
 
-    if args.is_savenii:
+    if args.is_savenii or True:
         args.test_save_dir = '../predictions'
         test_save_path = os.path.join(args.test_save_dir, args.exp, snapshot_name)
         os.makedirs(test_save_path, exist_ok=True)
