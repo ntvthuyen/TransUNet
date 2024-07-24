@@ -1,5 +1,8 @@
 # TransUNet for Eye Segmentation
-This repo holds code for [TransUNet: Transformers Make Strong Encoders for Medical Image Segmentation](https://arxiv.org/pdf/2102.04306.pdf)
+
+
+This repo holds code for Eye Segmentation task using TransUnet [TransUNet: Transformers Make Strong Encoders for Medical Image Segmentation](https://arxiv.org/pdf/2102.04306.pdf)
+
 
 ## Usage
 
@@ -13,11 +16,13 @@ mv {MODEL_NAME}.npz ../model/vit_checkpoint/imagenet21k/{MODEL_NAME}.npz
 
 ### 2. Prepare data
 
-Please go to ["./datasets/README.md"](datasets/README.md) for details, or please send an Email to jienengchen01 AT gmail.com to request the preprocessed data. If you would like to use the preprocessed data, please use it for research purposes and do not redistribute it.
+The model is trained using OpenEDS dataset
+
+[Link to OpenEDS dataset](https://www.kaggle.com/datasets/soumicksarker/openeds-dataset)
 
 ### 3. Environment
 
-Please prepare an environment with python=3.7, and then use the command "pip install -r requirements.txt" for the dependencies.
+Please prepare an environment with python=3.9, and then use the command "pip install -r requirements.txt" for the dependencies.
 
 ### 4. Train/Test
 
