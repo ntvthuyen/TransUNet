@@ -15,7 +15,7 @@ from tqdm import tqdm
 from utils import DiceLoss
 from torchvision import transforms
 
-def trainer_synapse(args, model, snapshot_path):
+def trainer_eyetracking(args, model, snapshot_path):
     from datasets.dataset_eyetracking import Eyetracking_dataset, RandomGenerator
     logging.basicConfig(filename=snapshot_path + "/log.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')

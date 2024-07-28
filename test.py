@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--volume_path', type=str,
                     default='../data/Synapse/test_vol_h5', help='root dir for validation volume data')  # for acdc volume_path=root_dir
 parser.add_argument('--dataset', type=str,
-                    default='Synapse', help='experiment_name')
+                    default='OpenEDS', help='experiment_name')
 parser.add_argument('--num_classes', type=int,
                     default=4, help='output channel of network')
 parser.add_argument('--list_dir', type=str,
@@ -80,11 +80,11 @@ if __name__ == "__main__":
     torch.cuda.manual_seed(args.seed)
 
     dataset_config = {
-        'Synapse': {
+        'OpenEDS': {
             'Dataset': Eyetracking_dataset,
-            'volume_path': '../data/Synapse/test_vol_h5',
-            'list_dir': './lists/lists_Synapse',
-            'num_classes': 9,
+            'volume_path': "./",#'../data/Synapse/test_vol_h5',
+            'list_dir': "./",#'./lists/lists_Synapse',
+            'num_classes': 3,
             'z_spacing': 1,
         },
     }
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     # name the same snapshot defined in train script!
     args.exp = 'TU_pretrain_R50-ViT-B_16_skip3_10k_epo20_bs24_224' #'TU_pretrain_R50-ViT-B_16_skip3_10k_epo15_bs24_224' #'TU_' + dataset_name + str(args.img_size)
-    snapshot_path = "../model/TU_Synapse224/" + args.exp
+    snapshot_path = "../model/TU_OpenEDS224/" + args.exp
     
     config_vit = CONFIGS_ViT_seg[args.vit_name]
     config_vit.n_classes = args.num_classes
