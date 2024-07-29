@@ -37,6 +37,9 @@ CUDA_VISIBLE_DEVICES=0 python train.py --dataset OpenEDS --vit_name R50-ViT-B_16
 ```bash
 python test.py --dataset OpenEDS --vit_name R50-ViT-B_16
 ```
+### 5. Inference 
+
+- import class from infer.py
 
 ## Reference
 * [Google ViT](https://github.com/google-research/vision_transformer)
