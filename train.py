@@ -7,7 +7,7 @@ import torch
 import torch.backends.cudnn as cudnn
 from networks.vit_seg_modeling import VisionTransformer as ViT_seg
 from networks.vit_seg_modeling import CONFIGS as CONFIGS_ViT_seg
-from trainer import trainer_synapse
+from trainer import trainer_eyetracking
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root_path', type=str,
@@ -56,10 +56,10 @@ if __name__ == "__main__":
     torch.cuda.manual_seed(args.seed)
     dataset_name = args.dataset
     dataset_config = {
-        'Synapse': {
-            'root_path': '../data/Synapse/train_npz',
-            'list_dir': './lists/lists_Synapse',
-            'num_classes': 9,
+        'OpenEDS':{
+            'root_path':  "",#'../data/Synapse/train_npz',
+            'list_dir': "",#'./lists/lists_Synapse',
+            'num_classes': 3,
         },
     }
     if args.batch_size != 24 and args.batch_size % 6 == 0:
@@ -91,5 +91,5 @@ if __name__ == "__main__":
     net = ViT_seg(config_vit, img_size=args.img_size, num_classes=config_vit.n_classes).cuda()
     net.load_from(weights=np.load(config_vit.pretrained_path))
 
-    trainer = {'Synapse': trainer_synapse,}
+    trainer = {'OpenEDS': trainer_eyetracking,}
     trainer[dataset_name](args, net, snapshot_path)
